@@ -8,11 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import android.widget.TextView
+import android.widget.Toast
 import edu.training.droidbountyhunterkotlin.DetalleActivity
 import edu.training.droidbountyhunterkotlin.R
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
+import edu.training.droidbountyhunterkotlin.network.JSONUtils
+import edu.training.droidbountyhunterkotlin.network.NetworkServices
+import edu.training.droidbountyhunterkotlin.network.onTaskListener
 import kotlinx.android.synthetic.main.fragment_list.*
 
 const val SECTION_NUMBER : String = "section_number"
@@ -39,13 +42,32 @@ class ListFragment : Fragment() {
     private fun actualizarDatos(listView: ListView?, modo: Int) {
         val database = DatabaseBountyHunter(context!!)
         val fugitivos = database.obtenerFugitivos(modo)
-        if (fugitivos.isNotEmpty()){
+        if (fugitivos.isNotEmpty()) {
             val values = ArrayList<String>()
-            fugitivos.mapTo(values){ it.name }
+            fugitivos.mapTo(values) { it.name }
             val adaptador = ArrayAdapter<String>(context, R.layout.item_fugitivo_list, values)
             listView!!.adapter = adaptador
             listView.tag = fugitivos
+        } else { // La base de datos se encuentra vacía
+            if (modo == 0){
+                val services = NetworkServices(object: onTaskListener {
+                    override fun tareaCompletada(respuesta: String) {
+                        JSONUtils.parsearFugitivos(respuesta, context!!)
+                        actualizarDatos(listView, modo)
+                    }
+
+                    override fun tareaConError(codigo: Int, mensaje: String,
+                                               error: String) {
+                        Toast.makeText(
+                            context,
+                            "Ocurrio un problema con el WebService!!! --- Código de error: $codigo \nMensaje: $mensaje",
+                            Toast.LENGTH_LONG).show()
+                    }
+                })
+                services.execute("Fugitivos")
+            }
         }
+
     }
 
 }

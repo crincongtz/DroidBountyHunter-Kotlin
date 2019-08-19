@@ -22,5 +22,5 @@
     <string name="nombre_desarrollador">Alejandro Rincón</string>
     <string name="etiqueta_empresa">D.W. Training S.C.</string>
     <string name="etiqueta_mensaje">Mensaje…</string>
-
+    <string name="boton_foto">Tomar Foto</string>
 </resources>

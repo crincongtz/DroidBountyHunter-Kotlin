@@ -3,9 +3,15 @@ package edu.training.droidbountyhunterkotlin
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
@@ -24,13 +30,15 @@ import edu.training.droidbountyhunterkotlin.utils.PictureTools
 import kotlinx.android.synthetic.main.activity_detalle.*
 import org.json.JSONObject
 
-class DetalleActivity : AppCompatActivity(){
+class DetalleActivity : AppCompatActivity(), LocationListener {
 
     private var UDID: String? = ""
     var fugitivo: Fugitivo? = null
     var database: DatabaseBountyHunter? = null
     private var direccionImagen: Uri? = null
     private val REQUEST_CODE_PHOTO_IMAGE = 1787
+    private val REQUEST_CODE_GPS = 1234
+    private var locationManager: LocationManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -45,6 +53,7 @@ class DetalleActivity : AppCompatActivity(){
         // Se identifica si es Fugitivo o capturado para el mensaje...
         if (fugitivo!!.status == 0){
             etiquetaMensaje.text = "El fugitivo sigue suelto..."
+            activarGPS()
         }else{
             etiquetaMensaje.text = "Atrapado!!!"
             botonCapturar.visibility = View.GONE
@@ -80,7 +89,7 @@ class DetalleActivity : AppCompatActivity(){
                     Toast.LENGTH_LONG).show()
             }
         })
-        services.execute("Atrapar",UDID)
+        services.execute("Atrapar", UDID)
         botonCapturar.visibility = View.GONE
         botonEliminar.visibility = View.GONE
         setResult(0)
@@ -120,6 +129,12 @@ class DetalleActivity : AppCompatActivity(){
             } else {
                 Log.d("RequestPermissions", "Camera - Not Granted")
             }
+        } else if (requestCode == REQUEST_CODE_GPS) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                activarGPS()
+            } else {
+                Log.d("RequestPermissions", "GPS - Not Granted")
+            }
         }
     }
 
@@ -142,5 +157,91 @@ class DetalleActivity : AppCompatActivity(){
         }
     }
 
+    override fun onLocationChanged(location: Location?) {
+        fugitivo!!.latitude = location!!.latitude
+        fugitivo!!.longitude = location.longitude
+    }
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+    }
+
+    override fun onProviderEnabled(provider: String?) {
+    }
+
+    override fun onProviderDisabled(provider: String?) {
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun activarGPS() {
+        if (isGPSActivated()) {
+            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0f, this)
+            Toast.makeText(this, "Activando GPS...", Toast.LENGTH_LONG).show()
+            val criteria = Criteria()
+            criteria.accuracy = Criteria.ACCURACY_FINE
+
+            // BestProvider
+            val provider = locationManager!!.getBestProvider(criteria, true)
+            // Getting last location available
+            val location = locationManager!!.getLastKnownLocation(provider)
+            if (location != null) {
+                fugitivo!!.latitude = location.latitude
+                fugitivo!!.longitude = location.longitude
+            }
+        }
+    }
+
+    private fun apagarGPS(){
+        if (locationManager != null) {
+            try {
+                locationManager!!.removeUpdates(this)
+                Toast.makeText(this, "Desactivando GPS...", Toast.LENGTH_LONG).show()
+            } catch (e: SecurityException) {
+                Toast.makeText(this, "Error desactivando GPS " + e.toString(),
+                    Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun isGPSActivated(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)){
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        REQUEST_CODE_GPS)
+                    return false
+                }else {
+                    //No explanation needed, we can request the permissions.
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        REQUEST_CODE_GPS)
+                    return false
+                }
+            }else {
+                return true
+            }
+        }else {
+            return true
+        }
+    }
+
+    override fun onDestroy() {
+        apagarGPS()
+        pictureFugitive.setImageBitmap(null)
+        System.gc()
+        super.onDestroy()
+    }
+
+    fun OnMapClick(view: View) {
+        val intent = Intent(this, MapsActivity::class.java)
+        intent.putExtra("fugitivo", fugitivo)
+        startActivity(intent)
+    }
 
 }

@@ -3,13 +3,16 @@ package edu.training.droidbountyhunterkotlin.models
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Fugitivo @JvmOverloads constructor(val id: Int, var name: String, var status: Int, var photo: String = "") : Parcelable {
+data class Fugitivo @JvmOverloads constructor(val id: Int, var name: String, var status: Int, var photo: String = "",
+                                              var latitude: Double = 0.0, var longitude: Double = 0.0) : Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString(),
         parcel.readInt(),
-        parcel.readString()
+        parcel.readString(),
+        parcel.readDouble(),
+        parcel.readDouble()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -17,6 +20,8 @@ data class Fugitivo @JvmOverloads constructor(val id: Int, var name: String, var
         parcel.writeString(name)
         parcel.writeInt(status)
         parcel.writeString(photo)
+        parcel.writeDouble(latitude)
+        parcel.writeDouble(longitude)
     }
 
     override fun describeContents() = 0

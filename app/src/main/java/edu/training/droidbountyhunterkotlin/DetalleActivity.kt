@@ -10,12 +10,10 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.provider.Settings
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
@@ -39,7 +37,7 @@ class DetalleActivity : AppCompatActivity(){
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
-        fugitivo = intent.extras["fugitivo"] as Fugitivo
+        fugitivo = intent.extras?.get("fugitivo") as Fugitivo
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
@@ -84,6 +82,7 @@ class DetalleActivity : AppCompatActivity(){
         botonCapturar.visibility = View.GONE
         botonEliminar.visibility = View.GONE
         setResult(0)
+        finish()
     }
 
     fun eliminarFugitivoPresionado(view: View){

@@ -1,7 +1,7 @@
 package edu.training.droidbountyhunterkotlin.fragments
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ class AcercaDeFragment : Fragment(){
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Se hace referencia al Fragment generado por XML en los Layouts y
         // se instancia en una View...
-        return inflater.inflate(R.layout.fragment_acerca_de,container,false)
+        return inflater.inflate(R.layout.fragment_acerca_de, container,false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

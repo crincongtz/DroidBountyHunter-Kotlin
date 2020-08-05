@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
@@ -59,7 +60,6 @@ class DetalleActivity : AppCompatActivity(){
         botonCapturar.visibility = View.GONE
         botonEliminar.visibility = View.GONE
         setResult(0)
-        finish()
     }
 
     fun eliminarFugitivoPresionado(view: View){

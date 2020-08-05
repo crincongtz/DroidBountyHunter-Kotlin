@@ -3,8 +3,7 @@ package edu.training.droidbountyhunterkotlin
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
@@ -27,7 +26,7 @@ class DetalleActivity : AppCompatActivity(){
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
-        fugitivo = intent.extras["fugitivo"] as Fugitivo
+        fugitivo = intent.extras?.get("fugitivo") as Fugitivo
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
@@ -60,6 +59,7 @@ class DetalleActivity : AppCompatActivity(){
         botonCapturar.visibility = View.GONE
         botonEliminar.visibility = View.GONE
         setResult(0)
+        finish()
     }
 
     fun eliminarFugitivoPresionado(view: View){

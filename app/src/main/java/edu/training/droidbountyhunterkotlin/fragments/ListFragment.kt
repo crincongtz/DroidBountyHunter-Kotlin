@@ -2,7 +2,7 @@ package edu.training.droidbountyhunterkotlin.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,10 +42,10 @@ class ListFragment : Fragment() {
     private fun actualizarDatos(listView: ListView?, modo: Int) {
         val database = DatabaseBountyHunter(context!!)
         val fugitivos = database.obtenerFugitivos(modo)
-        if (fugitivos.isNotEmpty()) {
-            val values = ArrayList<String>()
-            fugitivos.mapTo(values) { it.name }
-            val adaptador = ArrayAdapter<String>(context, R.layout.item_fugitivo_list, values)
+        if (fugitivos.isNotEmpty()){
+            val values = ArrayList<String?>()
+            fugitivos.mapTo(values){ it.name }
+            val adaptador = ArrayAdapter<String>(context!!, R.layout.item_fugitivo_list, values)
             listView!!.adapter = adaptador
             listView.tag = fugitivos
         } else { // La base de datos se encuentra vacía

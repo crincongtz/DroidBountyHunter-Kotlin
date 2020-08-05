@@ -12,8 +12,8 @@ class NetworkServices (val listener: onTaskListener) : AsyncTask<String, Void, B
 
     private val TAG = NetworkServices::class.java.simpleName
 
-    private val endpoint_fugitivos = "http://201.168.207.210/services/droidBHServices.svc/fugitivos"
-    private val endpoint_atrapados = "http://201.168.207.210/services/droidBHServices.svc/atrapados"
+    private val endpoint_fugitivos = "http://3.13.226.218/droidBHServices.svc/fugitivos"
+    private val endpoint_atrapados = "http://3.13.226.218/droidBHServices.svc/atrapados"
 
     private var JSONStr: String = ""
     private var tipo: SERVICE_TYPE = SERVICE_TYPE.FUGITIVOS
@@ -94,7 +94,7 @@ class NetworkServices (val listener: onTaskListener) : AsyncTask<String, Void, B
 
     @Throws(IOException::class, JSONException::class)
     private fun getStructuredRequest(type: SERVICE_TYPE, endpoint: String, id: String): HttpURLConnection {
-        val TIME_OUT = 500
+        val TIME_OUT = 5000
         val urlConnection: HttpURLConnection
         val url: URL?
         if (type === SERVICE_TYPE.FUGITIVOS) { //---------- GET Fugitivos--------------

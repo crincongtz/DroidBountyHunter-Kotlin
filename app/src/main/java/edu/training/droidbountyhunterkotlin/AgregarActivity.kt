@@ -1,7 +1,7 @@
 package edu.training.droidbountyhunterkotlin
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 
 class AgregarActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {

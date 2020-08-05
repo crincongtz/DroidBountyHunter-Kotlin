@@ -2,7 +2,7 @@ package edu.training.droidbountyhunterkotlin.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +32,8 @@ class ListFragment : Fragment() {
                 "Fabian Olguin",
                 "Karen Muñoz",
                 "Roque Rueda")
-        val adaptador = ArrayAdapter<String>(context, R.layout.item_fugitivo_list, dummyData)
+        val adaptador =
+            context?.let { ArrayAdapter<String>(it, R.layout.item_fugitivo_list, dummyData) }
         listaFugitivosCapturados.adapter = adaptador
         listaFugitivosCapturados.setOnItemClickListener { adapterView, view, position, id ->
             val intent = Intent(context, DetalleActivity::class.java)

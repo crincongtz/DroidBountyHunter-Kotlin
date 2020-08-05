@@ -40,9 +40,9 @@ class ListFragment : Fragment() {
         val database = DatabaseBountyHunter(context!!)
         val fugitivos = database.obtenerFugitivos(modo)
         if (fugitivos.isNotEmpty()){
-            val values = ArrayList<String>()
+            val values = ArrayList<String?>()
             fugitivos.mapTo(values){ it.name }
-            val adaptador = ArrayAdapter<String>(context, R.layout.item_fugitivo_list, values)
+            val adaptador = ArrayAdapter<String>(context!!, R.layout.item_fugitivo_list, values)
             listView!!.adapter = adaptador
             listView.tag = fugitivos
         }

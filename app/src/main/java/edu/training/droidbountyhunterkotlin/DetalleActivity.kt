@@ -15,7 +15,7 @@ class DetalleActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
-        fugitivo = intent.extras["fugitivo"] as Fugitivo
+        fugitivo = intent.extras?.get("fugitivo") as Fugitivo
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...

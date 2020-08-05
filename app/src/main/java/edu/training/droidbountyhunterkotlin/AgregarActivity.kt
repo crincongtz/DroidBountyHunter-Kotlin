@@ -2,8 +2,8 @@ package edu.training.droidbountyhunterkotlin
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import android.support.v7.app.AlertDialog
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import kotlinx.android.synthetic.main.activity_agregar.*

@@ -3,9 +3,9 @@ package edu.training.droidbountyhunterkotlin.models
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Fugitivo (
+data class Fugitivo(
     val id: Int = 0,
-    var name: String = "",
+    var name: String? = "",
     var status: Int = 0) : Parcelable {
 
     constructor(parcel: Parcel) : this(

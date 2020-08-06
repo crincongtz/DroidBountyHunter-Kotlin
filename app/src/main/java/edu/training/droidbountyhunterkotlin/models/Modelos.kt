@@ -3,8 +3,14 @@ package edu.training.droidbountyhunterkotlin.models
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Fugitivo @JvmOverloads constructor(val id: Int, var name: String, var status: Int, var photo: String = "",
-                                              var latitude: Double = 0.0, var longitude: Double = 0.0) : Parcelable {
+data class Fugitivo @JvmOverloads constructor(
+    val id: Int,
+    var name: String?,
+    var status: Int,
+    var photo: String? = "",
+    var latitude: Double = 0.0,
+    var longitude: Double = 0.0
+) : Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readInt(),

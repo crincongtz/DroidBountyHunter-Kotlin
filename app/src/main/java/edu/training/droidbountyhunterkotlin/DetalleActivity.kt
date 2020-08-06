@@ -66,10 +66,10 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    fun capturarFugitivoPresionado(view: View){
+    fun capturarFugitivoPresionado(view: View) {
         database = DatabaseBountyHunter(this)
         fugitivo!!.status = 1
-        if (fugitivo!!.photo.isNullOrEmpty()){
+        if (fugitivo!!.photo.isNullOrEmpty()) {
             Toast.makeText(this,
                 "Es necesario tomar la foto antes de capturar al fugitivo",
                 Toast.LENGTH_LONG).show()
@@ -154,21 +154,14 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
                     .decodeSampledBitmapFromUri(PictureTools.currentPhotoPath, 200, 200)
                 pictureFugitive.setImageBitmap(bitmap)
             }
+        } else if (requestCode == REQUEST_CODE_GPS){
+            activarGPS()
         }
     }
 
-    override fun onLocationChanged(location: Location?) {
-        fugitivo!!.latitude = location!!.latitude
+    override fun onLocationChanged(location: Location) {
+        fugitivo!!.latitude = location.latitude
         fugitivo!!.longitude = location.longitude
-    }
-
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-    }
-
-    override fun onProviderEnabled(provider: String?) {
-    }
-
-    override fun onProviderDisabled(provider: String?) {
     }
 
     @SuppressLint("MissingPermission")
@@ -183,7 +176,7 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
             // BestProvider
             val provider = locationManager!!.getBestProvider(criteria, true)
             // Getting last location available
-            val location = locationManager!!.getLastKnownLocation(provider)
+            val location = provider?.let { locationManager!!.getLastKnownLocation(it) }
             if (location != null) {
                 fugitivo!!.latitude = location.latitude
                 fugitivo!!.longitude = location.longitude
@@ -216,7 +209,7 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                         REQUEST_CODE_GPS)
                     return false
-                }else {
+                } else {
                     //No explanation needed, we can request the permissions.
                     ActivityCompat.requestPermissions(this,
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),

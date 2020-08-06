@@ -16,12 +16,12 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.provider.Settings
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
@@ -47,7 +47,7 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
-        fugitivo = intent.extras["fugitivo"] as Fugitivo
+        fugitivo = intent.extras?.get("fugitivo") as Fugitivo
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
@@ -57,19 +57,19 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
         }else{
             etiquetaMensaje.text = "Atrapado!!!"
             botonCapturar.visibility = View.GONE
-            if (fugitivo!!.photo.isNotEmpty()){
-                val bitmap = PictureTools.decodeSampledBitmapFromUri(fugitivo!!.photo,
+            val bitmap = fugitivo!!.photo?.let {
+                PictureTools.decodeSampledBitmapFromUri(
+                    it,
                     200,200)
-                pictureFugitive.setImageBitmap(bitmap)
             }
-
+            pictureFugitive.setImageBitmap(bitmap)
         }
     }
 
     fun capturarFugitivoPresionado(view: View){
         database = DatabaseBountyHunter(this)
         fugitivo!!.status = 1
-        if (fugitivo!!.photo.isEmpty()){
+        if (fugitivo!!.photo.isNullOrEmpty()){
             Toast.makeText(this,
                 "Es necesario tomar la foto antes de capturar al fugitivo",
                 Toast.LENGTH_LONG).show()

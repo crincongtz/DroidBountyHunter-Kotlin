@@ -3,16 +3,13 @@ package edu.training.droidbountyhunterkotlin
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Criteria
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE
 import android.provider.Settings
@@ -22,6 +19,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.*
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
@@ -30,7 +28,7 @@ import edu.training.droidbountyhunterkotlin.utils.PictureTools
 import kotlinx.android.synthetic.main.activity_detalle.*
 import org.json.JSONObject
 
-class DetalleActivity : AppCompatActivity(), LocationListener {
+class DetalleActivity : AppCompatActivity() {
 
     private var UDID: String? = ""
     var fugitivo: Fugitivo? = null
@@ -38,22 +36,26 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
     private var direccionImagen: Uri? = null
     private val REQUEST_CODE_PHOTO_IMAGE = 1787
     private val REQUEST_CODE_GPS = 1234
-    private var locationManager: LocationManager? = null
+
+    private var fusedLocationClient: FusedLocationProviderClient? = null
+    private var locationRequest: LocationRequest? = null
+    private var locationCallback: LocationCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         @SuppressLint("HardwareIds")
         UDID = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
+
+        setupLocationObjects()
+
         fugitivo = intent.extras?.get("fugitivo") as Fugitivo
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
         if (fugitivo!!.status == 0){
             etiquetaMensaje.text = "El fugitivo sigue suelto..."
-            activarGPS()
         }else{
             etiquetaMensaje.text = "Atrapado!!!"
             botonCapturar.visibility = View.GONE
@@ -63,6 +65,36 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
                     200,200)
             }
             pictureFugitive.setImageBitmap(bitmap)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (fugitivo!!.status == 0){
+            activarGPS()
+        }
+    }
+
+    private fun setupLocationObjects() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                if (locationResult?.lastLocation != null) {
+                    val location = locationResult.lastLocation
+                    Log.d("LocationCallback", "onLocationResult: $location")
+                    fugitivo!!.latitude = location.latitude
+                    fugitivo!!.longitude = location.longitude
+                } else {
+                    Log.d("LocationCallback", "Location missing in callback.")
+                }
+            }
         }
     }
 
@@ -159,40 +191,39 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    override fun onLocationChanged(location: Location) {
-        fugitivo!!.latitude = location.latitude
-        fugitivo!!.longitude = location.longitude
-    }
-
     @SuppressLint("MissingPermission")
     private fun activarGPS() {
         if (isGPSActivated()) {
-            locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0f, this)
-            Toast.makeText(this, "Activando GPS...", Toast.LENGTH_LONG).show()
-            val criteria = Criteria()
-            criteria.accuracy = Criteria.ACCURACY_FINE
 
-            // BestProvider
-            val provider = locationManager!!.getBestProvider(criteria, true)
+            fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+
+            Toast.makeText(this, "Activando GPS...", Toast.LENGTH_LONG).show()
             // Getting last location available
-            val location = provider?.let { locationManager!!.getLastKnownLocation(it) }
-            if (location != null) {
-                fugitivo!!.latitude = location.latitude
-                fugitivo!!.longitude = location.longitude
+            fusedLocationClient?.lastLocation?.addOnSuccessListener { location : Location? ->
+                // Got last known location. In some rare situations this can be null.
+                Log.d("CursoKotlin", "Last Known Location: $location")
+                location?.let {
+                    fugitivo!!.latitude = location.latitude
+                    fugitivo!!.longitude = location.longitude
+                }
             }
         }
     }
 
     private fun apagarGPS(){
-        if (locationManager != null) {
-            try {
-                locationManager!!.removeUpdates(this)
-                Toast.makeText(this, "Desactivando GPS...", Toast.LENGTH_LONG).show()
-            } catch (e: SecurityException) {
-                Toast.makeText(this, "Error desactivando GPS " + e.toString(),
-                    Toast.LENGTH_LONG).show()
+        try {
+            Toast.makeText(this, "Desactivando GPS...", Toast.LENGTH_LONG).show()
+            val removeTask = fusedLocationClient?.removeLocationUpdates(locationCallback)
+            removeTask?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("LocationRequest", "Location Callback removed.")
+                } else {
+                    Log.d("LocationRequest", "Failed to remove Location Callback.")
+                }
             }
+        } catch (e: SecurityException) {
+            Toast.makeText(this, "Error desactivando GPS $e",
+                Toast.LENGTH_LONG).show()
         }
     }
 
@@ -224,8 +255,12 @@ class DetalleActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    override fun onDestroy() {
+    override fun onStop() {
+        super.onStop()
         apagarGPS()
+    }
+
+    override fun onDestroy() {
         pictureFugitive.setImageBitmap(null)
         System.gc()
         super.onDestroy()

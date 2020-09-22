@@ -7,11 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
-import edu.training.droidbountyhunterkotlin.network.onTaskListener
+import edu.training.droidbountyhunterkotlin.network.OnTaskListener
 import kotlinx.android.synthetic.main.activity_detalle.*
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class DetalleActivity : AppCompatActivity(){
@@ -43,20 +45,23 @@ class DetalleActivity : AppCompatActivity(){
         database = DatabaseBountyHunter(this)
         fugitivo!!.status = 1
         database!!.actualizarFugitivo(fugitivo!!)
-        val services = NetworkServices(object: onTaskListener {
-            override fun tareaCompletada(respuesta: String) {
-                val obj = JSONObject(respuesta)
-                val mensaje = obj.optString("mensaje","")
-                mensajeDeCerrado(mensaje)
-            }
 
-            override fun tareaConError(codigo: Int, mensaje: String, error: String) {
-                Toast.makeText(applicationContext,
-                    "Ocurrio un problema en la comunicación con el WebService!!!",
-                    Toast.LENGTH_LONG).show()
-            }
-        })
-        services.execute("Atrapar",UDID)
+        lifecycleScope.launch {
+            NetworkServices.execute("Atrapar", object: OnTaskListener {
+                override fun tareaCompletada(respuesta: String) {
+                    val obj = JSONObject(respuesta)
+                    val mensaje = obj.optString("mensaje","")
+                    mensajeDeCerrado(mensaje)
+                }
+
+                override fun tareaConError(codigo: Int, mensaje: String, error: String) {
+                    Toast.makeText(applicationContext,
+                        "Ocurrio un problema en la comunicación con el WebService!!!",
+                        Toast.LENGTH_LONG).show()
+                }
+            }, UDID)
+        }
+
         botonCapturar.visibility = View.GONE
         botonEliminar.visibility = View.GONE
         setResult(0)

@@ -9,14 +9,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import edu.training.droidbountyhunterkotlin.DetalleActivity
 import edu.training.droidbountyhunterkotlin.R
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
-import edu.training.droidbountyhunterkotlin.network.JSONUtils
-import edu.training.droidbountyhunterkotlin.network.NetworkServices
-import edu.training.droidbountyhunterkotlin.network.onTaskListener
+import edu.training.droidbountyhunterkotlin.network.*
 import kotlinx.android.synthetic.main.fragment_list.*
+import kotlinx.coroutines.launch
 
 const val SECTION_NUMBER : String = "section_number"
 
@@ -50,22 +50,25 @@ class ListFragment : Fragment() {
             listView.tag = fugitivos
         } else { // La base de datos se encuentra vacía
             if (modo == 0){
-                val services = NetworkServices(object: onTaskListener {
-                    override fun tareaCompletada(respuesta: String) {
-                        JSONUtils.parsearFugitivos(respuesta, context!!)
-                        actualizarDatos(listView, modo)
-                    }
+                lifecycleScope.launch {
+                    NetworkServices.execute("Fugitivos", object: OnTaskListener {
+                        override fun tareaCompletada(respuesta: String) {
+                            JSONUtils.parsearFugitivos(respuesta, context!!)
+                            actualizarDatos(listView, modo)
+                        }
 
-                    override fun tareaConError(codigo: Int, mensaje: String,
-                                               error: String) {
-                        Toast.makeText(
-                            context,
-                            "Ocurrio un problema con el WebService!!! --- Código de error: $codigo \nMensaje: $mensaje",
-                            Toast.LENGTH_LONG).show()
-                    }
-                })
-                services.execute("Fugitivos")
+                        override fun tareaConError(codigo: Int, mensaje: String,
+                                                   error: String) {
+                            Toast.makeText(
+                                context,
+                                "Ocurrio un problema con el WebService!!! --- Código de error: $codigo \nMensaje: $mensaje",
+                                Toast.LENGTH_LONG).show()
+                        }
+                    })
+                }
+
             }
+
         }
 
     }

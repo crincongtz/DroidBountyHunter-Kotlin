@@ -16,8 +16,8 @@ class NetworkServices {
 
         private val TAG = NetworkServices::class.java.simpleName
 
-        private val endpoint_fugitivos = "http://3.13.226.218/droidBHServices.svc/fugitivos"
-        private val endpoint_atrapados = "http://3.13.226.218/droidBHServices.svc/atrapados"
+        private const val ENDPOINT_FUGITIVOS = "http://3.13.226.218/droidBHServices.svc/fugitivos"
+        private const val ENDPOINT_ATRAPADOS = "http://3.13.226.218/droidBHServices.svc/atrapados"
 
         private var JSONStr: String = ""
         private var tipo: SERVICE_TYPE = SERVICE_TYPE.FUGITIVOS
@@ -44,7 +44,7 @@ class NetworkServices {
             try {
                 urlConnection = getStructuredRequest(
                     tipo,
-                    if (esFugitivo) endpoint_fugitivos else endpoint_atrapados,
+                    if (esFugitivo) ENDPOINT_FUGITIVOS else ENDPOINT_ATRAPADOS,
                     uuid ?: ""
                 )
 

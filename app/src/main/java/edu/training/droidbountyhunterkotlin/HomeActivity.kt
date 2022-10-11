@@ -4,9 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import edu.training.droidbountyhunterkotlin.ui.main.SectionsPagerAdapter
-import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -16,6 +19,11 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        val viewPager = findViewById<ViewPager>(R.id.view_pager)
+        val tabs = findViewById<TabLayout>(R.id.tabs)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Create the adapter that will return a fragment for each of the three
@@ -23,8 +31,8 @@ class HomeActivity : AppCompatActivity() {
         mSectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        view_pager.adapter = mSectionsPagerAdapter
-        tabs.setupWithViewPager(view_pager)
+        viewPager.adapter = mSectionsPagerAdapter
+        tabs.setupWithViewPager(viewPager)
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)

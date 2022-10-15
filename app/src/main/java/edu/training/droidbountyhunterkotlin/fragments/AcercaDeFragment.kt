@@ -5,10 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import edu.training.droidbountyhunterkotlin.R
-import kotlinx.android.synthetic.main.fragment_acerca_de.*
 
 class AcercaDeFragment : Fragment(){
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Se hace referencia al Fragment generado por XML en los Layouts y
         // se instancia en una View...
@@ -23,6 +24,7 @@ class AcercaDeFragment : Fragment(){
         if (rating.isEmpty()){
             rating = "0.0"
         }
+        val ratingBar = view.findViewById<RatingBar>(R.id.ratingBar)
         ratingBar.rating = rating.toFloat()
         ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
             System.setProperty("rating", rating.toString())

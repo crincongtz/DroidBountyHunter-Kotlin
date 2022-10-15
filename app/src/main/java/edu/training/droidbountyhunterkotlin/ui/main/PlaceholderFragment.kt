@@ -5,16 +5,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import edu.training.droidbountyhunterkotlin.R
-
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
 class PlaceholderFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_home, container, false)
-        rootView.section_label.text = getString(R.string.section_format, arguments?.getInt(ARG_SECTION_NUMBER))
+        val sectionLabel = rootView.findViewById<TextView>(R.id.section_label)
+        sectionLabel.text = getString(R.string.section_format, arguments?.getInt(ARG_SECTION_NUMBER))
         return rootView
     }
 

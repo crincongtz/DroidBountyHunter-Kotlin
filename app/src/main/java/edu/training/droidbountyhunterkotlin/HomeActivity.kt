@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -36,8 +37,7 @@ class HomeActivity : AppCompatActivity() {
         tabs.setupWithViewPager(viewPager)
 
         fab.setOnClickListener { view ->
-            val intent = Intent(this, AgregarActivity::class.java)
-            startActivityForResult(intent, 0)
+            resultLauncher.launch(Intent(this, AgregarActivity::class.java))
         }
     }
 
@@ -47,13 +47,18 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_agregar) {
-            val intent = Intent(this, AgregarActivity::class.java)
-            startActivityForResult(intent,0)
-        }
+    private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
+        // TODO handle the result
+    }
 
-        return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.menu_agregar -> {
+                resultLauncher.launch(Intent(this, AgregarActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }

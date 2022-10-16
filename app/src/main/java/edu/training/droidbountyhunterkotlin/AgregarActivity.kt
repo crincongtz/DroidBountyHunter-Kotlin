@@ -6,7 +6,6 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
-import kotlinx.android.synthetic.main.activity_agregar.*
 
 class AgregarActivity : AppCompatActivity(){
 

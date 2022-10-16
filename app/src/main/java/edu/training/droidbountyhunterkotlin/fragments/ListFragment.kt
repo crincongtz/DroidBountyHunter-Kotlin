@@ -13,7 +13,6 @@ import edu.training.droidbountyhunterkotlin.DetalleActivity
 import edu.training.droidbountyhunterkotlin.R
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
-import kotlinx.android.synthetic.main.fragment_list.*
 
 const val SECTION_NUMBER : String = "section_number"
 
@@ -26,9 +25,10 @@ class ListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val modo = arguments!![SECTION_NUMBER] as Int
-        actualizarDatos(listaFugitivosCapturados, modo)
-        listaFugitivosCapturados.setOnItemClickListener { adapterView, view, position, id ->
+        val modo = requireArguments()[SECTION_NUMBER] as Int
+        val fugitivosCapturadosList = view.findViewById<ListView>(R.id.listaFugitivosCapturados)
+        actualizarDatos(fugitivosCapturadosList, modo)
+        fugitivosCapturadosList.setOnItemClickListener { adapterView, view, position, id ->
             val intent = Intent(context, DetalleActivity::class.java)
             val fugitivos = listaFugitivosCapturados.tag as Array<Fugitivo>
             intent.putExtra("fugitivo", fugitivos[position])

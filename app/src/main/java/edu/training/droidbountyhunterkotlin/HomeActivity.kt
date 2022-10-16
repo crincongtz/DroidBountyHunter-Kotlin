@@ -5,8 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.appcompat.widget.Toolbar
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import edu.training.droidbountyhunterkotlin.ui.main.SectionsPagerAdapter
-import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -16,6 +21,11 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        val viewPager = findViewById<ViewPager>(R.id.view_pager)
+        val tabs = findViewById<TabLayout>(R.id.tabs)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Create the adapter that will return a fragment for each of the three
@@ -23,12 +33,11 @@ class HomeActivity : AppCompatActivity() {
         mSectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        view_pager.adapter = mSectionsPagerAdapter
-        tabs.setupWithViewPager(view_pager)
+        viewPager.adapter = mSectionsPagerAdapter
+        tabs.setupWithViewPager(viewPager)
 
         fab.setOnClickListener { view ->
-            val intent = Intent(this, AgregarActivity::class.java)
-            startActivityForResult(intent, 0)
+            resultLauncher.launch(Intent(this, AgregarActivity::class.java))
         }
     }
 
@@ -38,13 +47,18 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_agregar) {
-            val intent = Intent(this, AgregarActivity::class.java)
-            startActivityForResult(intent,0)
-        }
+    private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
+        // TODO handle the result
+    }
 
-        return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.menu_agregar -> {
+                resultLauncher.launch(Intent(this, AgregarActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     fun actualizarListas(index: Int){

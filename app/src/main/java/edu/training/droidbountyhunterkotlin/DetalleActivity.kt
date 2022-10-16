@@ -5,7 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
-import kotlinx.android.synthetic.main.activity_detalle.*
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
 class DetalleActivity : AppCompatActivity(){
 

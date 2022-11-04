@@ -3,6 +3,7 @@ package edu.training.droidbountyhunterkotlin
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
+import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
@@ -15,6 +16,7 @@ class AgregarActivity : AppCompatActivity(){
     }
 
     fun guardarFugitivoPresionado(view: View){
+        val nombreFugitivoTextView = findViewById<EditText>(R.id.nombreFugitivoTextView)
         val nombre = nombreFugitivoTextView.text.toString()
         if (nombre.isNotEmpty()){
             val database = DatabaseBountyHunter(this)

@@ -9,19 +9,22 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.widget.Toolbar
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import edu.training.droidbountyhunterkotlin.ui.main.SectionsPagerAdapter
+import androidx.activity.viewModels
 
 class HomeActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    var viewPager: ViewPager? = null
+
+    private val viewModel: FugitivoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val viewPager = findViewById<ViewPager>(R.id.view_pager)
+        viewPager = findViewById<ViewPager>(R.id.view_pager)
         val tabs = findViewById<TabLayout>(R.id.tabs)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
 
@@ -33,11 +36,17 @@ class HomeActivity : AppCompatActivity() {
         mSectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        viewPager.adapter = mSectionsPagerAdapter
+        viewPager?.adapter = mSectionsPagerAdapter
         tabs.setupWithViewPager(viewPager)
 
         fab.setOnClickListener { view ->
             resultLauncher.launch(Intent(this, AgregarActivity::class.java))
+        }
+
+        viewModel.selectedFugitivo.observe(this) { fugitivo ->
+            val intent = Intent(this, DetalleActivity::class.java)
+            intent.putExtra("fugitivo", fugitivo)
+            resultLauncher.launch(intent)
         }
     }
 
@@ -48,7 +57,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
-        // TODO handle the result
+        actualizarListas(it.resultCode)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -61,14 +70,9 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    fun actualizarListas(index: Int){
-        view_pager.adapter = mSectionsPagerAdapter
-        view_pager.currentItem = index
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        actualizarListas(resultCode)
+    private fun actualizarListas(index: Int){
+        viewPager?.adapter = mSectionsPagerAdapter
+        viewPager?.currentItem = index
     }
 
 }

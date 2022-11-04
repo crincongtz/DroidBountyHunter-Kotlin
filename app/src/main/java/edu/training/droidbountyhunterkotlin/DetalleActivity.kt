@@ -3,10 +3,10 @@ package edu.training.droidbountyhunterkotlin
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
+import android.widget.Button
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 
 class DetalleActivity : AppCompatActivity(){
 
@@ -20,6 +20,8 @@ class DetalleActivity : AppCompatActivity(){
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
+        val etiquetaMensaje = findViewById<TextView>(R.id.etiquetaMensaje)
+        val botonCapturar = findViewById<Button>(R.id.botonCapturar)
         if (fugitivo!!.status == 0){
             etiquetaMensaje.text = "El fugitivo sigue suelto..."
         }else{
@@ -32,7 +34,7 @@ class DetalleActivity : AppCompatActivity(){
         database = DatabaseBountyHunter(this)
         fugitivo!!.status = 1
         database!!.actualizarFugitivo(fugitivo!!)
-        setResult(0)
+        setResult(1)
         finish()
     }
 
@@ -42,5 +44,4 @@ class DetalleActivity : AppCompatActivity(){
         setResult(0)
         finish()
     }
-
 }

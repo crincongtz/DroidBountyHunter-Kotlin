@@ -1,6 +1,5 @@
 package edu.training.droidbountyhunterkotlin.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import android.widget.TextView
-import edu.training.droidbountyhunterkotlin.DetalleActivity
+import androidx.fragment.app.activityViewModels
+import edu.training.droidbountyhunterkotlin.FugitivoViewModel
 import edu.training.droidbountyhunterkotlin.R
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
@@ -17,6 +16,8 @@ import edu.training.droidbountyhunterkotlin.models.Fugitivo
 const val SECTION_NUMBER : String = "section_number"
 
 class ListFragment : Fragment() {
+
+    private val viewModel: FugitivoViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Se hace referencia al Fragment generado por XML en los Layouts y
@@ -29,20 +30,18 @@ class ListFragment : Fragment() {
         val fugitivosCapturadosList = view.findViewById<ListView>(R.id.listaFugitivosCapturados)
         actualizarDatos(fugitivosCapturadosList, modo)
         fugitivosCapturadosList.setOnItemClickListener { adapterView, view, position, id ->
-            val intent = Intent(context, DetalleActivity::class.java)
-            val fugitivos = listaFugitivosCapturados.tag as Array<Fugitivo>
-            intent.putExtra("fugitivo", fugitivos[position])
-            startActivityForResult(intent,0)
+            val fugitivoList = fugitivosCapturadosList.tag as Array<Fugitivo>
+            viewModel.selectFugitivo(fugitivoList[position])
         }
     }
 
     private fun actualizarDatos(listView: ListView?, modo: Int) {
-        val database = DatabaseBountyHunter(context!!)
+        val database = DatabaseBountyHunter(requireContext())
         val fugitivos = database.obtenerFugitivos(modo)
         if (fugitivos.isNotEmpty()){
             val values = ArrayList<String?>()
             fugitivos.mapTo(values){ it.name }
-            val adaptador = ArrayAdapter<String>(context!!, R.layout.item_fugitivo_list, values)
+            val adaptador = ArrayAdapter<String>(requireContext(), R.layout.item_fugitivo_list, values)
             listView!!.adapter = adaptador
             listView.tag = fugitivos
         }

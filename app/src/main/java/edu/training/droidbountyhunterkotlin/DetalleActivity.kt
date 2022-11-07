@@ -15,14 +15,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
+import edu.training.droidbountyhunterkotlin.utils.PictureTools
+import kotlinx.android.synthetic.main.activity_detalle.*
+import androidx.lifecycle.lifecycleScope
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
-import edu.training.droidbountyhunterkotlin.network.onTaskListener
-import edu.training.droidbountyhunterkotlin.utils.PictureTools
-import kotlinx.android.synthetic.main.activity_detalle.*
+import edu.training.droidbountyhunterkotlin.network.OnTaskListener
+import kotlinx.coroutines.launch
 import org.json.JSONObject
+import android.widget.Button
+import android.widget.TextView
 
 class DetalleActivity : AppCompatActivity(){
 
@@ -31,6 +34,8 @@ class DetalleActivity : AppCompatActivity(){
     var database: DatabaseBountyHunter? = null
     private var direccionImagen: Uri? = null
     private val REQUEST_CODE_PHOTO_IMAGE = 1787
+
+    var botonCapturar: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -43,6 +48,8 @@ class DetalleActivity : AppCompatActivity(){
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
+        val etiquetaMensaje = findViewById<TextView>(R.id.etiquetaMensaje)
+        botonCapturar = findViewById(R.id.botonCapturar)
         if (fugitivo!!.status == 0){
             etiquetaMensaje.text = "El fugitivo sigue suelto..."
         }else{
@@ -67,23 +74,27 @@ class DetalleActivity : AppCompatActivity(){
             return
         }
         database!!.actualizarFugitivo(fugitivo!!)
-        val services = NetworkServices(object: onTaskListener {
-            override fun tareaCompletada(respuesta: String) {
-                val obj = JSONObject(respuesta)
-                val mensaje = obj.optString("mensaje","")
-                mensajeDeCerrado(mensaje)
-            }
 
-            override fun tareaConError(codigo: Int, mensaje: String, error: String) {
-                Toast.makeText(applicationContext,
-                    "Ocurrio un problema en la comunicación con el WebService!!!",
-                    Toast.LENGTH_LONG).show()
-            }
-        })
-        services.execute("Atrapar",UDID)
-        botonCapturar.visibility = View.GONE
+        lifecycleScope.launch {
+            NetworkServices.execute("Atrapar", object: OnTaskListener {
+                override fun tareaCompletada(respuesta: String) {
+                    val obj = JSONObject(respuesta)
+                    val mensaje = obj.optString("mensaje","")
+                    mensajeDeCerrado(mensaje)
+                }
+
+                override fun tareaConError(codigo: Int, mensaje: String, error: String) {
+                    Toast.makeText(applicationContext,
+                        "Ocurrio un problema en la comunicación con el WebService!!!",
+                        Toast.LENGTH_LONG).show()
+                }
+            }, UDID)
+        }
+
+        botonCapturar?.visibility = View.GONE
+        val botonEliminar = findViewById<Button>(R.id.botonEliminar)
         botonEliminar.visibility = View.GONE
-        setResult(0)
+        setResult(1)
     }
 
     fun eliminarFugitivoPresionado(view: View){

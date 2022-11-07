@@ -5,17 +5,30 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.appcompat.widget.Toolbar
+import androidx.viewpager.widget.ViewPager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.tabs.TabLayout
 import edu.training.droidbountyhunterkotlin.ui.main.SectionsPagerAdapter
-import kotlinx.android.synthetic.main.activity_home.*
+import androidx.activity.viewModels
 
 class HomeActivity : AppCompatActivity() {
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    var viewPager: ViewPager? = null
+
+    private val viewModel: FugitivoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        viewPager = findViewById<ViewPager>(R.id.view_pager)
+        val tabs = findViewById<TabLayout>(R.id.tabs)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Create the adapter that will return a fragment for each of the three
@@ -23,12 +36,17 @@ class HomeActivity : AppCompatActivity() {
         mSectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
 
         // Set up the ViewPager with the sections adapter.
-        view_pager.adapter = mSectionsPagerAdapter
-        tabs.setupWithViewPager(view_pager)
+        viewPager?.adapter = mSectionsPagerAdapter
+        tabs.setupWithViewPager(viewPager)
 
         fab.setOnClickListener { view ->
-            val intent = Intent(this, AgregarActivity::class.java)
-            startActivityForResult(intent, 0)
+            resultLauncher.launch(Intent(this, AgregarActivity::class.java))
+        }
+
+        viewModel.selectedFugitivo.observe(this) { fugitivo ->
+            val intent = Intent(this, DetalleActivity::class.java)
+            intent.putExtra("fugitivo", fugitivo)
+            resultLauncher.launch(intent)
         }
     }
 
@@ -38,23 +56,23 @@ class HomeActivity : AppCompatActivity() {
         return true
     }
 
+    private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
+        actualizarListas(it.resultCode)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_agregar) {
-            val intent = Intent(this, AgregarActivity::class.java)
-            startActivityForResult(intent,0)
+        return when(item.itemId) {
+            R.id.menu_agregar -> {
+                resultLauncher.launch(Intent(this, AgregarActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
-    fun actualizarListas(index: Int){
-        view_pager.adapter = mSectionsPagerAdapter
-        view_pager.currentItem = index
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        actualizarListas(resultCode)
+    private fun actualizarListas(index: Int){
+        viewPager?.adapter = mSectionsPagerAdapter
+        viewPager?.currentItem = index
     }
 
 }

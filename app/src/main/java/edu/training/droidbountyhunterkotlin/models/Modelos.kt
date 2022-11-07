@@ -6,7 +6,8 @@ import android.os.Parcelable
 data class Fugitivo(
     val id: Int = 0,
     var name: String? = "",
-    var status: Int = 0) : Parcelable {
+    var status: Int = 0
+) : Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readInt(),

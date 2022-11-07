@@ -12,15 +12,17 @@ import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
 import edu.training.droidbountyhunterkotlin.network.NetworkServices
 import edu.training.droidbountyhunterkotlin.network.OnTaskListener
-import kotlinx.android.synthetic.main.activity_detalle.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import android.widget.Button
+import android.widget.TextView
 
 class DetalleActivity : AppCompatActivity(){
 
     private var UDID: String? = ""
     var fugitivo: Fugitivo? = null
     var database: DatabaseBountyHunter? = null
+    var botonCapturar: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -33,11 +35,13 @@ class DetalleActivity : AppCompatActivity(){
         // Se obtiene el nombre del fugitivo del intent y se usa como título
         title = fugitivo!!.name + " - " + fugitivo!!.id
         // Se identifica si es Fugitivo o capturado para el mensaje...
+        val etiquetaMensaje = findViewById<TextView>(R.id.etiquetaMensaje)
+        botonCapturar = findViewById(R.id.botonCapturar)
         if (fugitivo!!.status == 0){
             etiquetaMensaje.text = "El fugitivo sigue suelto..."
         }else{
             etiquetaMensaje.text = "Atrapado!!!"
-            botonCapturar.visibility = View.GONE
+            botonCapturar?.visibility = View.GONE
         }
     }
 
@@ -62,9 +66,10 @@ class DetalleActivity : AppCompatActivity(){
             }, UDID)
         }
 
-        botonCapturar.visibility = View.GONE
+        botonCapturar?.visibility = View.GONE
+        val botonEliminar = findViewById<Button>(R.id.botonEliminar)
         botonEliminar.visibility = View.GONE
-        setResult(0)
+        setResult(1)
     }
 
     fun eliminarFugitivoPresionado(view: View){

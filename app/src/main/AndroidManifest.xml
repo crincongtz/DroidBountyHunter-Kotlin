@@ -16,6 +16,7 @@
             tools:ignore="GoogleAppIndexingWarning">
         <activity
                 android:name=".HomeActivity"
+                android:exported="true"
                 android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,10 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".AgregarActivity"
-                  android:label="@string/titulo_activity_agregar"/>
-        <activity android:name=".DetalleActivity"
-                  android:label="@string/titulo_activity_detalle"/>
+        <activity
+                android:name=".AgregarActivity"
+                android:label="@string/titulo_activity_agregar"/>
+        <activity
+                android:name=".DetalleActivity"
+                android:label="@string/titulo_activity_detalle"/>
     </application>
 
 </manifest>

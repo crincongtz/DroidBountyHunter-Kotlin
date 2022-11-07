@@ -26,6 +26,7 @@ import org.json.JSONObject
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.app.ActivityCompat
 
 class DetalleActivity : AppCompatActivity(){
@@ -138,24 +139,20 @@ class DetalleActivity : AppCompatActivity(){
         }
     }
 
+    private val resultLauncher = registerForActivityResult(StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            fugitivo!!.photo = PictureTools.currentPhotoPath
+            val bitmap = PictureTools
+                .decodeSampledBitmapFromUri(PictureTools.currentPhotoPath, 200, 200)
+            pictureFugitive?.setImageBitmap(bitmap)
+        }
+    }
+
     private fun obtenFotoDeCamara() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         direccionImagen = PictureTools.getOutputMediaFileUri(this, MEDIA_TYPE_IMAGE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, direccionImagen)
-        startActivityForResult(intent, REQUEST_CODE_PHOTO_IMAGE)
+        resultLauncher.launch(intent)
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PHOTO_IMAGE) {
-            if (resultCode == Activity.RESULT_OK) {
-                fugitivo!!.photo = PictureTools.currentPhotoPath
-                val bitmap = PictureTools
-                    .decodeSampledBitmapFromUri(PictureTools.currentPhotoPath, 200, 200)
-                pictureFugitive?.setImageBitmap(bitmap)
-            }
-        }
-    }
-
 
 }

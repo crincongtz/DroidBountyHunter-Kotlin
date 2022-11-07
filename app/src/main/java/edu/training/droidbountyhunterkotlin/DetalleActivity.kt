@@ -16,7 +16,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import edu.training.droidbountyhunterkotlin.utils.PictureTools
-import kotlinx.android.synthetic.main.activity_detalle.*
 import androidx.lifecycle.lifecycleScope
 import edu.training.droidbountyhunterkotlin.data.DatabaseBountyHunter
 import edu.training.droidbountyhunterkotlin.models.Fugitivo
@@ -25,7 +24,9 @@ import edu.training.droidbountyhunterkotlin.network.OnTaskListener
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 
 class DetalleActivity : AppCompatActivity(){
 
@@ -36,6 +37,7 @@ class DetalleActivity : AppCompatActivity(){
     private val REQUEST_CODE_PHOTO_IMAGE = 1787
 
     var botonCapturar: Button? = null
+    var pictureFugitive: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -50,17 +52,18 @@ class DetalleActivity : AppCompatActivity(){
         // Se identifica si es Fugitivo o capturado para el mensaje...
         val etiquetaMensaje = findViewById<TextView>(R.id.etiquetaMensaje)
         botonCapturar = findViewById(R.id.botonCapturar)
+        pictureFugitive = findViewById(R.id.pictureFugitive)
         if (fugitivo!!.status == 0){
             etiquetaMensaje.text = "El fugitivo sigue suelto..."
         }else{
             etiquetaMensaje.text = "Atrapado!!!"
-            botonCapturar.visibility = View.GONE
+            botonCapturar?.visibility = View.GONE
             val bitmap = fugitivo!!.photo?.let {
                 PictureTools.decodeSampledBitmapFromUri(
                     it,
                     200,200)
             }
-            pictureFugitive.setImageBitmap(bitmap)
+            pictureFugitive?.setImageBitmap(bitmap)
         }
     }
 
@@ -122,6 +125,7 @@ class DetalleActivity : AppCompatActivity(){
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PictureTools.REQUEST_CODE) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -148,7 +152,7 @@ class DetalleActivity : AppCompatActivity(){
                 fugitivo!!.photo = PictureTools.currentPhotoPath
                 val bitmap = PictureTools
                     .decodeSampledBitmapFromUri(PictureTools.currentPhotoPath, 200, 200)
-                pictureFugitive.setImageBitmap(bitmap)
+                pictureFugitive?.setImageBitmap(bitmap)
             }
         }
     }

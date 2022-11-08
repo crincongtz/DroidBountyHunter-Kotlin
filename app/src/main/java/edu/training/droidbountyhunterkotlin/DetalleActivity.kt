@@ -202,20 +202,6 @@ class DetalleActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_PHOTO_IMAGE) {
-            if (resultCode == Activity.RESULT_OK) {
-                fugitivo!!.photo = PictureTools.currentPhotoPath
-                val bitmap = PictureTools
-                    .decodeSampledBitmapFromUri(PictureTools.currentPhotoPath, 200, 200)
-                pictureFugitive.setImageBitmap(bitmap)
-            }
-        } else if (requestCode == REQUEST_CODE_GPS){
-            activarGPS()
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun activarGPS() {
         if (isGPSActivated()) {
@@ -286,7 +272,7 @@ class DetalleActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        pictureFugitive.setImageBitmap(null)
+        pictureFugitive?.setImageBitmap(null)
         System.gc()
         super.onDestroy()
     }
